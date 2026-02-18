@@ -6,9 +6,9 @@ from datetime import datetime
 import pickle
 import matplotlib.pyplot as plt
 import base64
+import os  # <-- added for file check
 
-
-# App layout
+# --- ST PAGE CONFIG ---
 st.set_page_config(page_title="Tanzania Food Price Prediction", layout="wide")
 
 # Black colored title using HTML
@@ -22,56 +22,58 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
 # Background Image
-# -----------------------------
 def set_bg(image_file):
-    with open(image_file, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode()
-    st.markdown(
-        f"""
-        <style>
-        .stApp {{
-            background-image: url("data:image/jpg;base64,{encoded}");
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }}
+    if os.path.exists(image_file):
+        with open(image_file, "rb") as f:
+            encoded = base64.b64encode(f.read()).decode()
+        st.markdown(
+            f"""
+            <style>
+            .stApp {{
+                background-image: url("data:image/jpg;base64,{encoded}");
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+            }}
 
-        /* Make all labels black */
-        label, .stMarkdown, .stTextInput label, .stNumberInput label,
-        .stSelectbox label, .stSlider label {{
-            color: black !important;
-            font-weight: 600;
-        }}
+            /* Make all labels black */
+            label, .stMarkdown, .stTextInput label, .stNumberInput label,
+            .stSelectbox label, .stSlider label {{
+                color: black !important;
+                font-weight: 600;
+            }}
 
-        /* Push buttons to top-left */
-        .top-left-buttons {{
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            z-index: 1000;
-        }}
+            /* Push buttons to top-left */
+            .top-left-buttons {{
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                z-index: 1000;
+            }}
 
-        .top-left-buttons button {{
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            margin-right: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            border-radius: 5px;
-        }}
+            .top-left-buttons button {{
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                margin-right: 5px;
+                cursor: pointer;
+                font-size: 14px;
+                border-radius: 5px;
+            }}
 
-        .top-left-buttons button:hover {{
-            background-color: #45a049;
-        }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+            .top-left-buttons button:hover {{
+                background-color: #45a049;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+    else:
+        st.warning("Background image not found. Continuing without background...")
 
+# Use relative path
 set_bg("back.jfif")
 
 # Load trained model and scaler
@@ -85,23 +87,20 @@ with open('model_columns.pkl', 'rb') as f:
     X_columns = pickle.load(f)
 
 # Load dataset to get unique values for dropdowns
-food = pd.read_csv(r"C:/Users/HP/Documents/food/food/Export.csv", on_bad_lines="skip")
-
+food = pd.read_csv("Export.csv", on_bad_lines="skip")
 
 # Convert date to datetime for processing
 food['date'] = pd.to_datetime(food['date'], errors='coerce')
 
 # Extract dropdown options
-region_options = sorted(food['admin1'].dropna().unique())      # admin1 as Region
-district_options = sorted(food['admin2'].dropna().unique())    # admin2 as District
+region_options = sorted(food['admin1'].dropna().unique())
+district_options = sorted(food['admin2'].dropna().unique())
 market_options = sorted(food['market'].dropna().unique())
 category_options = sorted(food['category'].dropna().unique())
 commodity_options = sorted(food['commodity'].dropna().unique())
 unit_options = sorted(food['unit'].dropna().unique())
 priceflag_options = sorted(food['priceflag'].dropna().unique())
 pricetype_options = sorted(food['pricetype'].dropna().unique())
-
-
 
 # --- SIDEBAR INPUTS ---
 st.sidebar.header("Input Market Price Features")
