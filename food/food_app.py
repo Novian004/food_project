@@ -24,10 +24,18 @@ st.markdown(
 )
 
 # Background Image
+# Use Path to find the correct folder
+BASE_DIR = Path(__file__).parent
+
+# Background Image Function
 def set_bg(image_file):
-    if os.path.exists(image_file):
-        with open(image_file, "rb") as f:
+    # Construct the full path to the image
+    image_path = BASE_DIR / image_file
+    
+    if image_path.exists():
+        with open(image_path, "rb") as f:
             encoded = base64.b64encode(f.read()).decode()
+        
         st.markdown(
             f"""
             <style>
@@ -36,45 +44,27 @@ def set_bg(image_file):
                 background-size: cover;
                 background-position: center;
                 background-repeat: no-repeat;
+                background-attachment: fixed; /* Keeps image from scrolling */
             }}
 
-            /* Make all labels black */
+            /* Ensure text is readable over the background */
             label, .stMarkdown, .stTextInput label, .stNumberInput label,
             .stSelectbox label, .stSlider label {{
                 color: black !important;
                 font-weight: 600;
-            }}
-
-            /* Push buttons to top-left */
-            .top-left-buttons {{
-                position: fixed;
-                top: 10px;
-                left: 10px;
-                z-index: 1000;
-            }}
-
-            .top-left-buttons button {{
-                background-color: #4CAF50;
-                color: white;
-                border: none;
-                padding: 8px 16px;
-                margin-right: 5px;
-                cursor: pointer;
-                font-size: 14px;
-                border-radius: 5px;
-            }}
-
-            .top-left-buttons button:hover {{
-                background-color: #45a049;
+                background-color: rgba(255, 255, 255, 0.4); /* Subtle white glow behind text */
+                padding: 2px;
+                border-radius: 4px;
             }}
             </style>
             """,
             unsafe_allow_html=True
         )
     else:
-        st.warning("Background image not found. Continuing without background...")
+        # This will tell you exactly where the app is looking if it fails
+        st.warning(f"Background image not found at: {image_path}")
 
-# Use relative path
+# Call the function
 set_bg("back.jfif")
 
 # 1. Define the folder where your files actually live
@@ -203,5 +193,6 @@ if st.sidebar.button("Predict Price"):
         st.pyplot(fig)
     else:
         st.warning("No historical data available for trend chart.")
+
 
 
