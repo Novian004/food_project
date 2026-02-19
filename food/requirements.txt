@@ -1,5 +1,6 @@
+streamlit
 pandas
 numpy
-scikit-learn
 matplotlib
-seaborn
+scikit-learn==1.5.1
+pillow
