@@ -5,6 +5,7 @@ import numpy as np
 from datetime import datetime
 import pickle
 import matplotlib.pyplot as plt
+from pathlib import Path
 import base64
 import os  # <-- added for file check
 
@@ -77,8 +78,10 @@ def set_bg(image_file):
 set_bg("back.jfif")
 
 # Load trained model and scaler
-with open('finalized_model.sav', 'rb') as f:
-    loaded_model = pickle.load(f)
+model_path = Path(__file__).parent / "finalized_model.sav"
+
+with open(model_path, "rb") as f:
+    model = pickle.load(f)
 
 with open('scaler.sav', 'rb') as f:
     sc = pickle.load(f)
@@ -196,3 +199,4 @@ if st.sidebar.button("Predict Price"):
         st.pyplot(fig)
     else:
         st.warning("No historical data available for trend chart.")
+
