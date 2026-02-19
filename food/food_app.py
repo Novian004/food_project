@@ -80,14 +80,11 @@ try:
 
     food = pd.read_csv(BASE_DIR / "Export.csv", on_bad_lines="skip")
     food['date'] = pd.to_datetime(food['date'], errors='coerce')
-    
+
 except FileNotFoundError as e:
-    st.error(f"📂 **File Not Found:** {e}")
-    st.info(f"Check if all files are in the folder: {BASE_DIR}")
+    st.error(f"File not found: {e}")
     st.stop()
-except Exception as e:
-    st.error(f"⚠️ **Initialization Error:** {e}")
-    st.stop()
+
 
 # Extract dropdown options
 region_options = sorted(food['admin1'].dropna().unique())
@@ -193,6 +190,7 @@ if st.sidebar.button("Predict Price"):
         st.pyplot(fig)
     else:
         st.warning("No historical data available for trend chart.")
+
 
 
 
