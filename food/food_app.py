@@ -67,27 +67,27 @@ def set_bg(image_file):
 # Call the function
 set_bg("back.jfif")
 
-# 1. Define the folder where your files actually live
-BASE_DIR = Path(__file__).parent 
+# --- LOAD ASSETS (Model, Scaler, Columns, Data) ---
+try:
+    with open(BASE_DIR / "finalized_model.sav", "rb") as f:
+        loaded_model = pickle.load(f)
 
-# 2. Load trained model using the full path
-# Note: I renamed 'model' to 'loaded_model' to match your prediction button code
-with open(BASE_DIR / "finalized_model.sav", "rb") as f:
-    loaded_model = pickle.load(f)
+    with open(BASE_DIR / "scaler.sav", "rb") as f:
+        sc = pickle.load(f)
 
-# 3. Load scaler using the full path
-with open(BASE_DIR / "scaler.sav", "rb") as f:
-    sc = pickle.load(f)
+    with open(BASE_DIR / "model_columns.pkl", "rb") as f:
+        X_columns = pickle.load(f)
 
-# 4. Load model columns using the full path
-with open(BASE_DIR / "model_columns.pkl", "rb") as f:
-    X_columns = pickle.load(f)
-
-# 5. Load dataset using the full path
-food = pd.read_csv(BASE_DIR / "Export.csv", on_bad_lines="skip")
-
-# Convert date to datetime for processing
-food['date'] = pd.to_datetime(food['date'], errors='coerce')
+    food = pd.read_csv(BASE_DIR / "Export.csv", on_bad_lines="skip")
+    food['date'] = pd.to_datetime(food['date'], errors='coerce')
+    
+except FileNotFoundError as e:
+    st.error(f"📂 **File Not Found:** {e}")
+    st.info(f"Check if all files are in the folder: {BASE_DIR}")
+    st.stop()
+except Exception as e:
+    st.error(f"⚠️ **Initialization Error:** {e}")
+    st.stop()
 
 # Extract dropdown options
 region_options = sorted(food['admin1'].dropna().unique())
@@ -193,6 +193,7 @@ if st.sidebar.button("Predict Price"):
         st.pyplot(fig)
     else:
         st.warning("No historical data available for trend chart.")
+
 
 
 
